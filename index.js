@@ -31,6 +31,10 @@ io.on("connection", (socket) => {
 	socket.on("init", (arg) => {
 		console.log(arg);
 	});
+	socket.emit("connection-server", () => {
+		console.log(`emitting`);
+		return true;
+	});
 });
 
 // io.on("init", (socket) => {
