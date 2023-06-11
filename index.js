@@ -15,7 +15,10 @@ const server = http.createServer(app);
 // const io = new Server(server);
 const io = require("socket.io")(server, {
 	cors: {
-		origins: ["http://localhost:3000"],
+		origins: [
+			"http://localhost:3000",
+			"https://planning-poker-client-uv3g.onrender.com/",
+		],
 	},
 });
 
@@ -23,25 +26,28 @@ app.get("/", (req, res) => {
 	res.send("<h1>Hello world</h1>");
 });
 
+// io - listens to server events. connection is an event on the server.
+// socket - listens to event on that connected socket
+
 io.on("connection", (socket) => {
 	console.log("a user connected");
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
 	});
-	socket.on("init", (arg) => {
-		console.log(arg);
+
+	socket.on("init", (user) => {
+		console.log(`User ${user} initialized connection.`);
 	});
-	socket.emit("connection-server", () => {
-		console.log(`emitting`);
-		return true;
+
+	socket.on("message", (msg) => {
+		console.log(`received message`);
+		console.log(msg);
+		if (msg) {
+			// emit on server
+			io.emit("message", msg);
+		}
 	});
 });
-
-// io.on("init", (socket) => {
-// 	socket.on("init", (arg) => {
-// 		console.log(arg);
-// 	});
-// });
 
 server.listen(PORT, () => {
 	console.log(`Server running. Listening on port ${PORT}`);
